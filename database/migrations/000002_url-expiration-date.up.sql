@@ -1,2 +1,3 @@
 ALTER TABLE shorturls
-  DROP COLUMN IF EXISTS idempotency_key
+  ADD COLUMN expires_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '1 day'
+
