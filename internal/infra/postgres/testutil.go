@@ -1,17 +1,23 @@
-package testutil
+package postgres
 
 import (
 	"context"
 	"database/sql"
+	"embed"
+	"log"
 	"testing"
+
+	_ "github.com/lib/pq"
 
 	"github.com/testcontainers/testcontainers-go"
 
-	"github.com/golang-migrate/migrate/v4"
-	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
-	internal_postgres "github.com/rcovery/go-url-shortener/internal/infra/postgres"
+	"github.com/pressly/goose/v3"
+
 	tc_postgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 )
+
+//go:embed migrations/*.sql
+var EmbedMigrations embed.FS
 
 func SetupContainer(ctx context.Context, t *testing.T) (*sql.DB, *tc_postgres.PostgresContainer) {
 	dbName := "gourl"
@@ -45,7 +51,7 @@ func SetupContainer(ctx context.Context, t *testing.T) (*sql.DB, *tc_postgres.Po
 }
 
 func SetupDatabase(ctx context.Context, t *testing.T, connectionString string) *sql.DB {
-	instance, instanceErr := internal_postgres.NewDatabaseConnection(connectionString)
+	instance, instanceErr := NewDatabaseConnection(connectionString)
 	if instanceErr != nil {
 		t.Fatalf("Cannot get database instance: %v", instanceErr.Error())
 	}
@@ -54,19 +60,19 @@ func SetupDatabase(ctx context.Context, t *testing.T, connectionString string) *
 }
 
 func SetupMigrations(ctx context.Context, t *testing.T, instance *sql.DB) {
-	driver, migrateErr := migrate_postgres.WithInstance(instance, &migrate_postgres.Config{})
-	if migrateErr != nil {
-		t.Fatalf("Cannot get migration instance: %v", migrateErr.Error())
+	goose.SetBaseFS(EmbedMigrations)
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		panic(err)
 	}
 
-	m, migrateErr := migrate.NewWithDatabaseInstance(
-		"file://../../database/migrations",
-		"postgres", driver)
-	if migrateErr != nil {
-		t.Fatalf("Cannot get migration database instance: %v", migrateErr.Error())
+	if err := goose.Up(instance, "migrations"); err != nil {
+		panic(err)
 	}
+}
 
-	if err := m.Up(); err != nil {
-		t.Fatalf("Cannot run migrations: %v", err.Error())
+func TerminateContainer(postgresContainer *tc_postgres.PostgresContainer) {
+	if err := testcontainers.TerminateContainer(postgresContainer); err != nil {
+		log.Printf("failed to terminate container: %s", err)
 	}
 }

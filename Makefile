@@ -2,13 +2,14 @@
 include .env
 
 migration:
-	migrate create -ext sql -dir ./database/migrations -seq $$NAME
+	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=disable"
+	goose create -dir database/migrations $$NAME sql 
 
 migrateup:
-	migrate -path ./database/migrations -database "postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=disable" up
+	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=disable" goose up -dir database/migrations
 
 migratedown:
-	migrate -path ./database/migrations -database "postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=disable" down
+	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=disable" goose down -dir database/migrations
 
 testcoverage:
 	go test ./... -coverprofile
