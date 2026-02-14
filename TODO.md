@@ -1,7 +1,8 @@
 ✅ Implement repo integration tests
 ✅ Implement repo fn
 
-How interfaces and types work in golang
+How interfaces, structs and types work in golang
+
 Implement service fn
 Implement service tests
 Implement service fn
@@ -11,3 +12,7 @@ Search if it's a good thing to create a "name" type and "NewName" fn (just to pa
 Search if it's a good thing to create a "link" type and "NewLink" fn (same)
 
 (?) Implement a screen that I can search for some link in the database, or export a report. The mainly goal of this screen is to make something fast when I stress test it
+
+Possible problems
+(?) Opened database connections. Should close repo instance after use it
+(?) postgres/testutil.go maybe will be compiled too
