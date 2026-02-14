@@ -3,18 +3,17 @@ package shorturl
 import "context"
 
 type Reader interface {
-	Select(ctx context.Context, id ID) (ID, error)
+	SelectByName(ctx context.Context, name string) (string, error)
+	SelectByIdempotencyKey(ctx context.Context, idempotencyKey IdempotencyKey) (string, error)
 }
 
 type Writer interface {
-	Insert(ctx context.Context, shortURL ShortURL) (ID, error)
-	Update(ctx context.Context, shortURL ShortURL) error
-	Delete(ctx context.Context, id ID) error
+	Insert(ctx context.Context, id ID, name string, link string, idempotencyKey IdempotencyKey) error
 }
 
 type Repository interface {
 	Reader
 	Writer
 
-	Close(ctx context.Context) error
+	// Close(ctx context.Context) error
 }

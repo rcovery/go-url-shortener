@@ -7,16 +7,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
+	"github.com/rcovery/go-url-shortener/internal/infra/postgres"
 )
 
 func main() {
-	user, pass, dbname := os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBNAME")
-	dataSourceName := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, pass, dbname)
-	db, err := sql.Open("postgres", dataSourceName)
+	connectionString := postgres.GetConnectionFromEnv()
+	db, err := postgres.NewDatabaseConnection(connectionString)
 	if err != nil {
 		panic(err)
 	}

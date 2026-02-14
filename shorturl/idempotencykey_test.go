@@ -13,7 +13,7 @@ func TestNewIdempotencyKey(t *testing.T) {
 			t.Fatalf("NewID() %v", err)
 		}
 
-		if IdempotencyKey.String() == "" {
+		if IdempotencyKey == "" {
 			t.Errorf("Expected a IdempotencyKey, received nothing")
 		}
 	})
