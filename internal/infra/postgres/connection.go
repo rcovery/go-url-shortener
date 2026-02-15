@@ -7,7 +7,7 @@ import (
 )
 
 func GetConnectionFromEnv() string {
-	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBNAME"))
+	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBDATABASE"))
 }
 
 func NewDatabaseConnection(connectionString string) (*sql.DB, error) {
