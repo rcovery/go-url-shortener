@@ -19,7 +19,7 @@ func NewService(repo Repository) *Service {
 
 func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyKey, name string, link string) (string, error) {
 	urlFound, urlError := s.Repo.SelectByIdempotencyKey(ctx, idempotencyKey)
-	if urlError != nil {
+	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
 	if urlFound != "" {
