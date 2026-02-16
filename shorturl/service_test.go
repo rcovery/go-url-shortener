@@ -42,4 +42,63 @@ func TestCreate(t *testing.T) {
 			t.Errorf("created a duplicated URL %q", duplicatedUrl)
 		}
 	})
+
+	t.Run("should return error when name already exists", func(t *testing.T) {
+		ctx := context.Background()
+		instance, postgresContainer := infra_postgres.SetupContainer(ctx, t)
+		defer infra_postgres.TerminateContainer(postgresContainer)
+
+		repo := postgres.NewRepository(instance)
+		service := shorturl.NewService(repo)
+
+		id1, _ := shorturl.NewID()
+		idempotencyKey1, _ := shorturl.NewIdempotencyKey()
+		name := "taken-name"
+		link := "https://example.com"
+
+		_, firstErr := service.Create(ctx, id1, idempotencyKey1, name, link)
+		if firstErr != nil {
+			t.Fatalf("first Create failed unexpectedly: %v", firstErr)
+		}
+
+		id2, _ := shorturl.NewID()
+		idempotencyKey2, _ := shorturl.NewIdempotencyKey()
+
+		result, secondErr := service.Create(ctx, id2, idempotencyKey2, name, "https://other.com")
+		if secondErr == nil {
+			t.Errorf("expected an error when creating with duplicate name, got nil")
+		}
+		if result != "" {
+			t.Errorf("want empty string, got %q", result)
+		}
+	})
+
+	t.Run("should return existing link for same idempotency key", func(t *testing.T) {
+		ctx := context.Background()
+		instance, postgresContainer := infra_postgres.SetupContainer(ctx, t)
+		defer infra_postgres.TerminateContainer(postgresContainer)
+
+		repo := postgres.NewRepository(instance)
+		service := shorturl.NewService(repo)
+
+		id1, _ := shorturl.NewID()
+		idempotencyKey, _ := shorturl.NewIdempotencyKey()
+		name := "idempotent-link"
+		link := "https://example.com/original"
+
+		firstResult, firstErr := service.Create(ctx, id1, idempotencyKey, name, link)
+		if firstErr != nil {
+			t.Fatalf("first Create failed unexpectedly: %v", firstErr)
+		}
+
+		id2, _ := shorturl.NewID()
+
+		secondResult, secondErr := service.Create(ctx, id2, idempotencyKey, name, link)
+		if secondErr != nil {
+			t.Errorf("expected no error for idempotent creation, got %v", secondErr)
+		}
+		if secondResult != firstResult {
+			t.Errorf("want %q, got %q", firstResult, secondResult)
+		}
+	})
 }
