@@ -198,3 +198,24 @@ Key direct dependencies:
   password: `dev123`, database: `gourl`, port: `5432`).
 - No Dockerfile for the Go application itself.
 - Tests use testcontainers (no docker-compose needed for tests).
+
+## Skills
+
+This project has specialized skills defined in `.opencode/skills/`. When a task
+matches one of the skills below, **always load and follow the skill instructions
+instead of working from scratch**. Use the `skill` tool to load the appropriate
+skill by name.
+
+| Skill | Name | When to use |
+| --- | --- | --- |
+| Go Test | `go-test` | Writing, fixing, or improving integration and unit tests. Follows the project's red/green cycle, external test packages, table-driven subtests, and testcontainers conventions. |
+| TODO Add | `todo-add` | Adding tasks, study topics, or notes to the project `TODO.md`. Handles categorization, duplicate checking, and proper formatting. |
+| Git Commit | `git-commit` | Committing changes to git. Analyzes the working tree, decides whether to split or combine commits, uses conventional commit format, and asks for confirmation. |
+
+**Rules:**
+- If the user asks to write tests, load the `go-test` skill.
+- If the user asks to add something to the TODO list or track a task/study
+  topic, load the `todo-add` skill.
+- If the user asks to commit changes, load the `git-commit` skill.
+- When in doubt about whether a skill applies, load it -- the skill itself
+  contains detailed instructions for deciding whether it is relevant.
