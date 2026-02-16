@@ -14,7 +14,7 @@
 - [ ] Make `Service.Repo` unexported (`repo` instead of `Repo`)
 - [ ] Remove `database/sql` import from `shorturl/service.go` — define a domain-level "not found" error
 - [ ] Have repository return `*ShortURL` instead of raw `string`
-- [ ] Use `db.QueryContext(ctx, ...)` instead of `db.Query(...)` to respect context cancellation
+- [x] Use `db.QueryContext(ctx, ...)` instead of `db.Query(...)` to respect context cancellation
 - [ ] Use the `ShortURL` domain struct (currently defined but never instantiated)
 
 ## Database

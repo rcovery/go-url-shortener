@@ -19,7 +19,7 @@ func NewRepository(DB *sql.DB) *Repository {
 }
 
 func (r *Repository) SelectByName(ctx context.Context, name string) (string, error) {
-	row := r.DB.QueryRow(`
+	row := r.DB.QueryRowContext(ctx, `
 		SELECT link
 		FROM shorturls
 		WHERE name = $1
@@ -39,7 +39,7 @@ func (r *Repository) SelectByName(ctx context.Context, name string) (string, err
 }
 
 func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey shorturl.IdempotencyKey) (string, error) {
-	row := r.DB.QueryRow(`
+	row := r.DB.QueryRowContext(ctx, `
 		SELECT link
 		FROM shorturls
 		WHERE idempotency_key = $1
@@ -58,7 +58,7 @@ func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey 
 }
 
 func (r *Repository) Insert(ctx context.Context, id shorturl.ID, name string, link string, idempotencyKey shorturl.IdempotencyKey) error {
-	_, insertionErr := r.DB.Exec(`
+	_, insertionErr := r.DB.ExecContext(ctx, `
 		INSERT INTO shorturls
 		(id, name, link, idempotency_key)
 		VALUES
