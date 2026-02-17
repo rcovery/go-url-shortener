@@ -82,6 +82,22 @@ Use this skill when the user asks to:
    - For study topics: include the topic name and a short note on scope or
      relevance (e.g., `- [ ] Connection pooling -- understand how database/sql
      pool works, when to tune MaxOpenConns/MaxIdleConns`)
+   - For study topics: add a very short description (1-2 sentences) about what
+     the topic is and why it matters, as indented lines right after the main
+     entry. This gives the user immediate context without needing to open links.
+   - For study topics: add 2-4 reference links as indented lines below the
+     description. Prefer official docs, Go blog posts, and well-known tutorial
+     sites. Format each link as `- <url> (<short label>)`. Only include links
+     you are confident are real and correct (official Go docs, pkg.go.dev,
+     go.dev/blog, go.dev/doc, DigitalOcean tutorials, etc.). Do NOT fabricate
+     or guess URLs.
+   - Study topic example:
+     ```markdown
+     - [ ] Connection pooling -- understand how database/sql pool works, when to tune MaxOpenConns/MaxIdleConns
+       Manages a pool of reusable DB connections to avoid the overhead of opening a new connection per query.
+       - https://go.dev/doc/database/manage-connections (official Go docs on managing connections)
+       - https://pkg.go.dev/database/sql (database/sql package reference)
+     ```
    - Match the wording style of existing entries (imperative verbs for tasks:
      "Add...", "Fix...", "Implement...")
 

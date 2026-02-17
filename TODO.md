@@ -38,8 +38,8 @@
 ## Security
 
 - [ ] Add input validation on URL creation (valid URL format, name length/characters)
-- [ ] Make `sslmode` configurable (currently hardcoded to `disable`)
-- [ ] Replace real credentials in `.env.example` with placeholders
+- [x] Make `sslmode` configurable (currently hardcoded to `disable`)
+- [x] Replace real credentials in `.env.example` with placeholders
 
 ## Production Readiness (for new main.go)
 
@@ -49,7 +49,7 @@
 - [ ] Add request/access logging middleware
 - [ ] Make server port and bind address configurable via env vars
 - [ ] Return JSON response bodies on success and error
-- [ ] Validate `Content-Type: application/json` on POST requests
+- [x] Validate `Content-Type: application/json` on POST requests
 - [ ] Limit request body size (`http.MaxBytesReader`)
 - [ ] Add HTTP server timeouts (`ReadTimeout`, `WriteTimeout`, `IdleTimeout`)
 - [ ] Add rate limiting
@@ -60,8 +60,8 @@
 - [ ] Add service tests for error paths, idempotent creation, and invalid inputs
 - [ ] Add repository tests for edge cases (non-existent name, expired URL, duplicates)
 - [ ] Add uniqueness test for `IdempotencyKey` (like `ID` test already has)
-- [ ] Add tests for `internal/infra/postgres/connection.go`
-- [ ] Remove commented-out test code in `service_test.go`
+- [ ] ? Add tests for `internal/infra/postgres/connection.go`
+- [x] Remove commented-out test code in `service_test.go`
 - [ ] Check errors from `NewID()` / `NewIdempotencyKey()` in tests instead of discarding
 
 ## Build & Deployment
@@ -84,6 +84,17 @@
 ## Feature Ideas
 
 - [ ] Implement a search/dashboard screen for looking up links and exporting reports
+
+## Study Backlog
+
+> Backend concepts and Go-specific topics to study. Ordered roughly by
+> relevance to current project work.
+
+- [ ] Context package in Go -- understand `context.Background()`, `context.TODO()`, `context.WithCancel`, `context.WithTimeout`, `context.WithValue`; how context propagation and cancellation work across goroutines, HTTP handlers, and database calls
+  - https://go.dev/blog/context (Go blog: "Go Concurrency Patterns: Context")
+  - https://pkg.go.dev/context (official package docs)
+  - https://www.digitalocean.com/community/tutorials/how-to-use-contexts-in-go (practical tutorial with examples)
+  - https://go.dev/doc/database/cancel-operations (cancelling database operations with context)
 
 ## Completed
 
