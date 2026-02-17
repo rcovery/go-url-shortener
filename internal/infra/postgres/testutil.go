@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"fmt"
 	"log"
+	"os"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -20,9 +22,10 @@ import (
 var EmbedMigrations embed.FS
 
 func SetupContainer(ctx context.Context, t *testing.T) (*sql.DB, *tc_postgres.PostgresContainer) {
-	dbName := "gourl"
-	dbUser := "dev"
-	dbPassword := "dev123"
+	dbName := os.Getenv("DBDATABASE")
+	dbUser := os.Getenv("DBUSER")
+	dbPassword := os.Getenv("DBPASS")
+	dbSslmode := os.Getenv("DBSSLMODE")
 
 	postgresContainer, containerErr := tc_postgres.Run(
 		ctx, "postgres:latest",
@@ -39,7 +42,7 @@ func SetupContainer(ctx context.Context, t *testing.T) (*sql.DB, *tc_postgres.Po
 
 	testcontainers.CleanupContainer(t, postgresContainer)
 
-	connectionString, connectionStringErr := postgresContainer.ConnectionString(ctx, "sslmode=disable")
+	connectionString, connectionStringErr := postgresContainer.ConnectionString(ctx, fmt.Sprintf("sslmode=%s", dbSslmode))
 	if connectionStringErr != nil {
 		t.Fatalf("Cannot get connection string: %v", connectionStringErr.Error())
 	}
