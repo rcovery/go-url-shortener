@@ -34,12 +34,9 @@ func TestCreate(t *testing.T) {
 		id2, _ := shorturl.NewID()
 		idempotencyKey2, _ := shorturl.NewIdempotencyKey()
 
-		duplicatedUrl, _ := service.Create(ctx, id2, idempotencyKey2, name, link)
-		// if duplicatedErr == nil {
-		// 	t.Errorf("created a duplicated URL %q", creationErr)
-		// }
-		if createdShorturl == duplicatedUrl {
-			t.Errorf("created a duplicated URL %q", duplicatedUrl)
+		duplicatedURL, _ := service.Create(ctx, id2, idempotencyKey2, name, link)
+		if createdShorturl == duplicatedURL {
+			t.Errorf("created a duplicated URL %q", duplicatedURL)
 		}
 	})
 
@@ -99,6 +96,33 @@ func TestCreate(t *testing.T) {
 		}
 		if secondResult != firstResult {
 			t.Errorf("want %q, got %q", firstResult, secondResult)
+		}
+	})
+
+	t.Run("should get a link by his name", func(t *testing.T) {
+		ctx := context.Background()
+		instance, postgresContainer := infra_postgres.SetupContainer(ctx, t)
+		defer infra_postgres.TerminateContainer(postgresContainer)
+
+		repo := postgres.NewRepository(instance)
+		service := shorturl.NewService(repo)
+
+		id1, _ := shorturl.NewID()
+		idempotencyKey, _ := shorturl.NewIdempotencyKey()
+		name := "googlewebsitey2k"
+		link := "https://google.com"
+
+		createdLink, creationErr := service.Create(ctx, id1, idempotencyKey, name, link)
+		if creationErr != nil {
+			t.Fatalf("first Create failed unexpectedly: %v", creationErr)
+		}
+
+		selectedLink, selectErr := service.Select(ctx, name)
+		if selectErr != nil {
+			t.Errorf("expected no error for idempotent creation, got %v", selectErr)
+		}
+		if selectedLink != createdLink {
+			t.Errorf("want %q, got %q", createdLink, selectedLink)
 		}
 	})
 }

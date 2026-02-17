@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	infra_postgres "github.com/rcovery/go-url-shortener/internal/infra/postgres"
 	"github.com/rcovery/go-url-shortener/shorturl"
