@@ -3,11 +3,19 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"os"
+
+	"github.com/rcovery/go-url-shortener/internal/config"
 )
 
 func GetConnectionFromEnv() string {
-	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s", os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBDATABASE"), os.Getenv("DBSSLMODE"))
+	return fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=%s",
+		config.GetString("DBHOST"),
+		config.GetString("DBUSER"),
+		config.GetString("DBPASS"),
+		config.GetString("DBDATABASE"),
+		config.GetString("DBSSLMODE"),
+	)
 }
 
 func NewDatabaseConnection(connectionString string) (*sql.DB, error) {
