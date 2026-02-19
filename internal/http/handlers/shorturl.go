@@ -70,10 +70,8 @@ func HandleShortURL(service *shorturl.Service) {
 		switch r.Method {
 		case "GET":
 			{
-				ctx, ctxCancel := context.WithTimeout(context.Background(), 1*time.Second)
+				ctx, ctxCancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 				defer ctxCancel()
-
-				time.Sleep(10 * time.Second)
 
 				urlName := r.PathValue("url_name")
 				urlFromDatabase, selectionError := service.Select(ctx, urlName)
