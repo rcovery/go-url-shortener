@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	"github.com/rcovery/go-url-shortener/internal/config"
 
 	"github.com/testcontainers/testcontainers-go"
 
@@ -22,12 +21,10 @@ import (
 var EmbedMigrations embed.FS
 
 func SetupContainer(ctx context.Context, t *testing.T) (*sql.DB, *tc_postgres.PostgresContainer) {
-	config.InitConfig()
-
-	dbName := config.GetString("DBDATABASE")
-	dbUser := config.GetString("DBUSER")
-	dbPassword := config.GetString("DBPASS")
-	dbSslmode := config.GetString("DBSSLMODE")
+	dbName := "DBDATABASE"
+	dbUser := "DBUSER"
+	dbPassword := "DBPASS"
+	dbSslmode := "disable"
 
 	log.Printf("%v %v %v %v\n", dbName, dbPassword, dbUser, dbSslmode)
 	postgresContainer, containerErr := tc_postgres.Run(

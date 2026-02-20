@@ -10,9 +10,6 @@ func InitConfig() {
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
-	viper.AddConfigPath("..")
-	viper.AddConfigPath("../..")
-	viper.AddConfigPath("../../..")
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
