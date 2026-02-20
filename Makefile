@@ -13,3 +13,6 @@ migratedown:
 
 testcoverage:
 	go test ./... -coverprofile
+
+stresstest:
+	cat scripts/script.js | docker run --network host --rm -i grafana/k6 run - 
