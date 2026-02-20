@@ -8,17 +8,17 @@ import (
 )
 
 type Service struct {
-	Repo Repository
+	repo Repository
 }
 
 func NewService(repo Repository) *Service {
 	return &Service{
-		Repo: repo,
+		repo: repo,
 	}
 }
 
 func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyKey, name string, link string) (string, error) {
-	urlFound, urlError := s.Repo.SelectByIdempotencyKey(ctx, idempotencyKey)
+	urlFound, urlError := s.repo.SelectByIdempotencyKey(ctx, idempotencyKey)
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
@@ -26,7 +26,7 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 		return urlFound, nil
 	}
 
-	urlFound, urlError = s.Repo.SelectByName(ctx, name)
+	urlFound, urlError = s.repo.SelectByName(ctx, name)
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
@@ -34,7 +34,7 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 		return "", fmt.Errorf("cannot create a new URL with %q", name)
 	}
 
-	insertedErr := s.Repo.Insert(ctx, id, name, link, idempotencyKey)
+	insertedErr := s.repo.Insert(ctx, id, name, link, idempotencyKey)
 	if insertedErr != nil {
 		return "", insertedErr
 	}
@@ -43,7 +43,7 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 }
 
 func (s *Service) Select(ctx context.Context, name string) (string, error) {
-	urlFound, urlError := s.Repo.SelectByName(ctx, name)
+	urlFound, urlError := s.repo.SelectByName(ctx, name)
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
