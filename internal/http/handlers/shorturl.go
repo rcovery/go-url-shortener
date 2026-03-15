@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -22,37 +21,39 @@ func HandleShortURL(service *shorturl.Service) {
 
 				contentType := r.Header.Get("Content-Type")
 				if contentType != "application/json" {
-					w.WriteHeader(400)
+					writeJSONError(w, http.StatusBadRequest, "invalid_content_type")
 					return
 				}
 
-				rawBody := r.Body
+				rawBody := http.MaxBytesReader(w, r.Body, 1*MB)
 				body, err := io.ReadAll(rawBody)
 				if err != nil {
-					fmt.Println("Erro ao receber body!")
+					log.Println("failed reading body:", err)
+					writeJSONError(w, http.StatusBadRequest, "invalid_body")
 					return
 				}
 				if len(body) == 0 {
-					fmt.Println("Body está vazio!")
+					writeJSONError(w, http.StatusBadRequest, "empty_body")
 					return
 				}
 
 				var createURLBody shorturl.ShortURL
 				err = json.Unmarshal(body, &createURLBody)
 				if err != nil {
-					fmt.Println("Não foi possível decodificar o JSON!")
+					log.Println("failed decoding json:", err)
+					writeJSONError(w, http.StatusBadRequest, "invalid_json")
 					return
 				}
 
 				createdLink, URLErr := service.Create(ctx, createURLBody.ID, createURLBody.IdempotencyKey, createURLBody.Name, createURLBody.Link)
 				if URLErr != nil {
 					log.Println(URLErr)
-					w.WriteHeader(400)
+					writeJSONError(w, http.StatusBadRequest, "create_failed")
 					break
 				}
 				if createdLink == "" {
 					log.Println("Created an empty URL")
-					w.WriteHeader(400)
+					writeJSONError(w, http.StatusBadRequest, "create_failed")
 					break
 				}
 
@@ -61,7 +62,7 @@ func HandleShortURL(service *shorturl.Service) {
 			}
 		default:
 			{
-				w.WriteHeader(405)
+				writeJSONError(w, http.StatusMethodNotAllowed, "method_not_allowed")
 			}
 		}
 	})
@@ -77,7 +78,7 @@ func HandleShortURL(service *shorturl.Service) {
 				urlFromDatabase, selectionError := service.Select(ctx, urlName)
 				if selectionError != nil || urlFromDatabase == "" {
 					log.Println(selectionError)
-					w.WriteHeader(404)
+					writeJSONError(w, http.StatusNotFound, "not_found")
 					break
 				}
 
@@ -87,8 +88,26 @@ func HandleShortURL(service *shorturl.Service) {
 			}
 		default:
 			{
-				w.WriteHeader(405)
+				writeJSONError(w, http.StatusMethodNotAllowed, "method_not_allowed")
 			}
 		}
 	})
 }
+
+func writeJSONError(w http.ResponseWriter, status int, code string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	encodeErr := json.NewEncoder(w).Encode(map[string]string{
+		"error": code,
+	})
+	if encodeErr != nil {
+		log.Println("failed encoding json error:", encodeErr)
+	}
+}
+
+const (
+	B  int64 = 1
+	KB       = 1024 * B
+	MB       = 1024 * KB
+)

@@ -11,7 +11,7 @@
 
 ## Architecture
 
-- [ ] Make `Service.Repo` unexported (`repo` instead of `Repo`)
+- [x] Make `Service.Repo` unexported (`repo` instead of `Repo`)
 - [ ] Remove `database/sql` import from `shorturl/service.go` — define a domain-level "not found" error
 - [ ] Have repository return `*ShortURL` instead of raw `string`
 - [x] Use `db.QueryContext(ctx, ...)` instead of `db.Query(...)` to respect context cancellation
@@ -25,7 +25,7 @@
 - [ ] Add index on `shorturls.idempotency_key`
 - [ ] Add index on `shorturls.expires_at` (or composite index on `name, expires_at`)
 - [ ] Add NOT NULL constraint on `idempotency_key` column
-- [ ] Change `link` column from VARCHAR(255) to TEXT
+- [x] Change `link` column from VARCHAR(255) to TEXT
 - [ ] Add trigger or application logic to update `updated_at` on modification
 - [ ] Make URL expiration configurable (currently hardcoded to 1 day)
 - [ ] Add cleanup mechanism for expired URLs
@@ -50,8 +50,8 @@
 - [ ] Make server port and bind address configurable via env vars
 - [ ] Return JSON response bodies on success and error
 - [x] Validate `Content-Type: application/json` on POST requests
-- [ ] Limit request body size (`http.MaxBytesReader`)
-- [ ] Add HTTP server timeouts (`ReadTimeout`, `WriteTimeout`, `IdleTimeout`)
+- [x] Limit request body size (`http.MaxBytesReader`)
+- [ ] Add HTTP server timeouts (`ReadTimeout`, `WriteTimeout`, `IdleTimeout`). Add context cancelling, with cancel reason
 - [ ] Add rate limiting
 - [ ] Add CORS headers
 

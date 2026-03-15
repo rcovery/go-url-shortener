@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE shorturls (
  id UUID PRIMARY KEY,
- link VARCHAR(255) NOT NULL,
+ link text NOT NULL,
  name VARCHAR(255) NOT NULL,
  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

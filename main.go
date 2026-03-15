@@ -29,8 +29,6 @@ func main() {
 	host := config.GetString("HOST")
 	port := config.GetString("PORT")
 
-	log.Printf("%v:%v\n", host, port)
-
 	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
