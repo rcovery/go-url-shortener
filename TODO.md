@@ -1,8 +1,5 @@
 # TODO
 
-> `main.go` is legacy and will be rewritten last. Issues specific to it are not
-> tracked here — they will be resolved when it is replaced.
-
 ## Critical Bugs
 
 - [x] Fix `GetConnectionFromEnv()` reading `DBNAME` env var — `.env` defines `DBDATABASE`
