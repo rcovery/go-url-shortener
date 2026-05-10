@@ -3,8 +3,8 @@ package shorturl
 import "context"
 
 type Reader interface {
-	SelectByName(ctx context.Context, name string) (string, error)
-	SelectByIdempotencyKey(ctx context.Context, idempotencyKey IdempotencyKey) (string, error)
+	SelectByName(ctx context.Context, name string) (SelectableShortURL, error)
+	SelectByIdempotencyKey(ctx context.Context, idempotencyKey IdempotencyKey) (SelectableShortURL, error)
 }
 
 type Writer interface {

@@ -22,15 +22,15 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
-	if urlFound != "" {
-		return urlFound, nil
+	if urlFound.ID != "" {
+		return urlFound.Link, nil
 	}
 
 	urlFound, urlError = s.repo.SelectByName(ctx, name)
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
-	if urlFound != "" {
+	if urlFound.ID != "" {
 		return "", fmt.Errorf("cannot create a new URL with %q", name)
 	}
 
@@ -47,9 +47,9 @@ func (s *Service) Select(ctx context.Context, name string) (string, error) {
 	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
 		return "", urlError
 	}
-	if urlFound == "" {
+	if urlFound.ID == "" {
 		return "", fmt.Errorf("cannot retrieve this URL with %q", name)
 	}
 
-	return urlFound, nil
+	return urlFound.Link, nil
 }

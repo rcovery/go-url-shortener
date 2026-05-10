@@ -32,11 +32,11 @@ func TestSelect(t *testing.T) {
 		if err != nil {
 			t.Errorf("Cannot get URL by name, instead got %q", err)
 		}
-		if foundShorturl == "" {
+		if foundShorturl.Link == "" {
 			t.Errorf("Empty short url, maybe try to insert before")
 		}
 
-		if foundShorturl != link {
+		if foundShorturl.Link != link {
 			t.Errorf("want %q, got %q", link, foundShorturl)
 		}
 	})
@@ -62,11 +62,11 @@ func TestSelect(t *testing.T) {
 		if err != nil {
 			t.Errorf("Cannot get URL by name, instead got %q", err)
 		}
-		if foundShorturl == "" {
+		if foundShorturl.Link == "" {
 			t.Errorf("Empty short url, maybe try to insert before")
 		}
 
-		if foundShorturl != link {
+		if foundShorturl.Link != link {
 			t.Errorf("want %q, got %q", link, foundShorturl)
 		}
 	})
