@@ -37,8 +37,8 @@ func (r *Repository) SelectByName(ctx context.Context, name string) (shorturl.Se
 	}
 
 	return shorturl.SelectableShortURL{
-		id,
-		link,
+		ID:   id,
+		Link: link,
 	}, nil
 }
 
@@ -61,8 +61,8 @@ func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey 
 	}
 
 	return shorturl.SelectableShortURL{
-		id,
-		link,
+		ID:   id,
+		Link: link,
 	}, nil
 }
 
