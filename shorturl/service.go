@@ -20,9 +20,9 @@ func NewService(repo Repository) *Service {
 
 func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyKey, name string, link string) (string, error) {
 	urlFound, urlError := s.repo.SelectByIdempotencyKey(ctx, idempotencyKey)
-	_, ok := errors.AsType[*notfound.NotFound](urlError)
+	_, isNotFoundError := errors.AsType[*notfound.NotFound](urlError)
 
-	if urlError != nil && ok {
+	if urlError != nil && !isNotFoundError {
 		return "", urlError
 	}
 	if urlFound.ID != "" {
@@ -30,9 +30,9 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 	}
 
 	urlFound, urlError = s.repo.SelectByName(ctx, name)
-	_, ok = errors.AsType[*notfound.NotFound](urlError)
+	_, isNotFoundError = errors.AsType[*notfound.NotFound](urlError)
 
-	if urlError != nil && ok {
+	if urlError != nil && !isNotFoundError {
 		return "", urlError
 	}
 	if urlFound.ID != "" {
