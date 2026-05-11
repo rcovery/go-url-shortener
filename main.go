@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/rcovery/go-url-shortener/internal/config"
@@ -16,11 +22,22 @@ import (
 func main() {
 	config.InitConfig()
 
+	baseContext, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
 	connectionString := infra_postgres.GetConnectionFromEnv()
 	db, databaseErr := infra_postgres.NewDatabaseConnection(connectionString)
 	if databaseErr != nil {
 		panic(databaseErr)
 	}
+
+	otelShutdown, err := config.SetupOTelSDK(baseContext)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
 
 	repoInstance := postgres.NewRepository(db)
 	serviceInstance := shorturl.NewService(repoInstance)
@@ -29,7 +46,27 @@ func main() {
 	host := config.GetString("HOST")
 	port := config.GetString("PORT")
 
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil); err != http.ErrServerClosed {
+	server := &http.Server{
+		Addr:         fmt.Sprintf("%s:%s", host, port),
+		BaseContext:  func(net.Listener) context.Context { return baseContext },
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 1 * time.Second,
+	}
+
+	srvErr := make(chan error, 1)
+	go func() {
+		srvErr <- server.ListenAndServe()
+	}()
+
+	select {
+	case err = <-srvErr:
+		log.Fatal(err)
+	case <-baseContext.Done():
+		stop()
+	}
+
+	err = server.Shutdown(context.Background())
+	if err != nil {
 		log.Fatal(err)
 	}
 }
