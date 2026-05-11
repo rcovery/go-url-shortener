@@ -12,8 +12,3 @@ type SelectableShortURL struct {
 	ID   ID
 	Link string
 }
-
-type NotFound struct {
-	Code    int
-	Message int
-}

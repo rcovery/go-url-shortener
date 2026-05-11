@@ -2,9 +2,10 @@ package shorturl
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/rcovery/go-url-shortener/shorturl/errors/notfound"
 )
 
 type Service struct {
@@ -19,7 +20,9 @@ func NewService(repo Repository) *Service {
 
 func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyKey, name string, link string) (string, error) {
 	urlFound, urlError := s.repo.SelectByIdempotencyKey(ctx, idempotencyKey)
-	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
+	_, ok := errors.AsType[*notfound.NotFound](urlError)
+
+	if urlError != nil && ok {
 		return "", urlError
 	}
 	if urlFound.ID != "" {
@@ -27,7 +30,9 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 	}
 
 	urlFound, urlError = s.repo.SelectByName(ctx, name)
-	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
+	_, ok = errors.AsType[*notfound.NotFound](urlError)
+
+	if urlError != nil && ok {
 		return "", urlError
 	}
 	if urlFound.ID != "" {
@@ -44,7 +49,9 @@ func (s *Service) Create(ctx context.Context, id ID, idempotencyKey IdempotencyK
 
 func (s *Service) Select(ctx context.Context, name string) (string, error) {
 	urlFound, urlError := s.repo.SelectByName(ctx, name)
-	if urlError != nil && !errors.Is(urlError, sql.ErrNoRows) {
+	_, ok := errors.AsType[*notfound.NotFound](urlError)
+
+	if urlError != nil && ok {
 		return "", urlError
 	}
 	if urlFound.ID == "" {

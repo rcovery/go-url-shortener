@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/rcovery/go-url-shortener/shorturl"
+	"github.com/rcovery/go-url-shortener/shorturl/errors/notcreated"
+	"github.com/rcovery/go-url-shortener/shorturl/errors/notfound"
 )
 
 type Repository struct {
@@ -32,8 +33,7 @@ func (r *Repository) SelectByName(ctx context.Context, name string) (shorturl.Se
 
 	scanErr := row.Scan(&id, &link)
 	if scanErr != nil {
-		log.Println("ByName: Cannot scan link")
-		return shorturl.SelectableShortURL{}, scanErr
+		return shorturl.SelectableShortURL{}, notfound.New("ByName: Cannot scan link")
 	}
 
 	return shorturl.SelectableShortURL{
@@ -56,8 +56,7 @@ func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey 
 
 	scanErr := row.Scan(&id, &link)
 	if scanErr != nil {
-		log.Println("ByIdempotencyKey: Cannot scan link")
-		return shorturl.SelectableShortURL{}, scanErr
+		return shorturl.SelectableShortURL{}, notfound.New("ByIdempotencyKey: Cannot scan link")
 	}
 
 	return shorturl.SelectableShortURL{
@@ -75,5 +74,9 @@ func (r *Repository) Insert(ctx context.Context, id shorturl.ID, name string, li
 	`, id, name, link, idempotencyKey,
 	)
 
-	return insertionErr
+	if insertionErr != nil {
+		notcreated.New(insertionErr.Error())
+	}
+
+	return nil
 }
