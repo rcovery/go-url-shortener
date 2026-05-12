@@ -29,18 +29,14 @@ func (r *Repository) SelectByName(ctx context.Context, name string) (shorturl.Se
 		LIMIT 1
 	`, name)
 
-	var link string
-	var id shorturl.ID
+	var surl shorturl.SelectableShortURL
 
-	scanErr := row.Scan(&id, &link)
+	scanErr := row.Scan(&surl.ID, &surl.Link)
 	if scanErr != nil {
-		return shorturl.SelectableShortURL{}, notfound.New(fmt.Sprintf("ByName: %v", scanErr))
+		return surl, notfound.New(fmt.Sprintf("ByName: %v", scanErr))
 	}
 
-	return shorturl.SelectableShortURL{
-		ID:   id,
-		Link: link,
-	}, nil
+	return surl, nil
 }
 
 func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey shorturl.IdempotencyKey) (shorturl.SelectableShortURL, error) {
@@ -52,18 +48,14 @@ func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey 
 		LIMIT 1
 	`, idempotencyKey)
 
-	var id shorturl.ID
-	var link string
+	var surl shorturl.SelectableShortURL
 
-	scanErr := row.Scan(&id, &link)
+	scanErr := row.Scan(&surl.ID, &surl.Link)
 	if scanErr != nil {
-		return shorturl.SelectableShortURL{}, notfound.New(fmt.Sprintf("ByIdempotencyKey: %v", scanErr))
+		return surl, notfound.New(fmt.Sprintf("ByIdempotencyKey: %v", scanErr))
 	}
 
-	return shorturl.SelectableShortURL{
-		ID:   id,
-		Link: link,
-	}, nil
+	return surl, nil
 }
 
 func (r *Repository) Insert(ctx context.Context, id shorturl.ID, name string, link string, idempotencyKey shorturl.IdempotencyKey) error {
