@@ -3,16 +3,16 @@ include .env
 
 migration:
 	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=$(DBSSLMODE)"
-	goose create -dir database/migrations $$NAME sql 
+	goose create -dir internal/infra/postgres/migrations $$NAME sql 
 
 migrateup:
-	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=$(DBSSLMODE)" goose up -dir database/migrations
+	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=$(DBSSLMODE)" goose up -dir internal/infra/postgres/migrations
 
 migratedown:
-	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=$(DBSSLMODE)" goose down -dir database/migrations
+	GOOSE_DBSTRING="postgresql://$(DBUSER):$(DBPASS)@localhost:5432/$(DBDATABASE)?sslmode=$(DBSSLMODE)" goose down -dir internal/infra/postgres/migrations
 
 testcoverage:
-	go test ./... -coverprofile
+	go test ./... -cover profile.cov
 
 stresstest:
 	cat scripts/script.js | docker run --network host --rm -i grafana/k6 run - 
