@@ -6,8 +6,7 @@ import (
 	"fmt"
 
 	"github.com/rcovery/go-url-shortener/shorturl"
-	"github.com/rcovery/go-url-shortener/shorturl/errors/notcreated"
-	"github.com/rcovery/go-url-shortener/shorturl/errors/notfound"
+	"github.com/rcovery/go-url-shortener/shorturl/errs"
 )
 
 type Repository struct {
@@ -29,12 +28,20 @@ func (r *Repository) SelectByName(ctx context.Context, name string) (shorturl.Se
 		LIMIT 1
 	`, name)
 
+	var rawDBLink string
 	var surl shorturl.SelectableShortURL
 
-	scanErr := row.Scan(&surl.ID, &surl.Link)
+	scanErr := row.Scan(&surl.ID, &rawDBLink)
 	if scanErr != nil {
-		return surl, notfound.New(fmt.Sprintf("ByName: %v", scanErr))
+		return surl, errs.NotFoundError.New(fmt.Sprintf("ByName: %v", scanErr))
 	}
+
+	link, linkErr := shorturl.NewLink(rawDBLink)
+	if linkErr != nil {
+		return surl, errs.NotFoundError.New(fmt.Sprintf("ByName: %v", scanErr))
+	}
+
+	surl.Link = link
 
 	return surl, nil
 }
@@ -48,27 +55,35 @@ func (r *Repository) SelectByIdempotencyKey(ctx context.Context, idempotencyKey 
 		LIMIT 1
 	`, idempotencyKey)
 
+	var rawDBLink string
 	var surl shorturl.SelectableShortURL
 
-	scanErr := row.Scan(&surl.ID, &surl.Link)
+	scanErr := row.Scan(&surl.ID, &rawDBLink)
 	if scanErr != nil {
-		return surl, notfound.New(fmt.Sprintf("ByIdempotencyKey: %v", scanErr))
+		return surl, errs.NotFoundError.New(fmt.Sprintf("ByIdempotencyKey: %v", scanErr))
 	}
+
+	link, linkErr := shorturl.NewLink(rawDBLink)
+	if linkErr != nil {
+		return surl, errs.NotFoundError.New(fmt.Sprintf("ByName: %v", scanErr))
+	}
+
+	surl.Link = link
 
 	return surl, nil
 }
 
-func (r *Repository) Insert(ctx context.Context, id shorturl.ID, name string, link string, idempotencyKey shorturl.IdempotencyKey) error {
+func (r *Repository) Insert(ctx context.Context, id shorturl.ID, name string, link *shorturl.Link, idempotencyKey shorturl.IdempotencyKey) error {
 	_, insertionErr := r.DB.ExecContext(ctx, `
 		INSERT INTO shorturls
 		(id, name, link, idempotency_key)
 		VALUES
 		($1, $2, $3, $4)
-	`, id, name, link, idempotencyKey,
+	`, id, name, link.String(), idempotencyKey,
 	)
 
 	if insertionErr != nil {
-		return notcreated.New(insertionErr.Error())
+		return errs.NotCreatedErr.New(insertionErr.Error())
 	}
 
 	return nil

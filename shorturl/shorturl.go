@@ -2,7 +2,7 @@ package shorturl
 
 type ShortURL struct {
 	ID             ID
-	Link           string
+	Link           *Link
 	Name           string
 	IdempotencyKey IdempotencyKey
 	ExpiresAt      string
@@ -10,5 +10,5 @@ type ShortURL struct {
 
 type SelectableShortURL struct {
 	ID   ID
-	Link string
+	Link *Link
 }

@@ -21,7 +21,8 @@ func TestSelect(t *testing.T) {
 
 		id, _ := shorturl.NewID()
 		idempotencyKey, _ := shorturl.NewIdempotencyKey()
-		name, link := "RCovery", "https://neocities.org"
+		name := "RCovery"
+		link, _ := shorturl.NewLink("https://neocities.org")
 
 		insertErr := repo.Insert(ctx, id, name, link, idempotencyKey)
 		if insertErr != nil {
@@ -32,12 +33,12 @@ func TestSelect(t *testing.T) {
 		if err != nil {
 			t.Errorf("Cannot get URL by name, instead got %q", err)
 		}
-		if foundShorturl.Link == "" {
+		if foundShorturl.Link == nil {
 			t.Errorf("Empty short url, maybe try to insert before")
 		}
 
-		if foundShorturl.Link != link {
-			t.Errorf("want %q, got %q", link, foundShorturl)
+		if !foundShorturl.Link.Equals(link) {
+			t.Errorf("want %q, got %q", link, foundShorturl.Link)
 		}
 	})
 
@@ -51,7 +52,8 @@ func TestSelect(t *testing.T) {
 
 		id, _ := shorturl.NewID()
 		idempotencyKey, _ := shorturl.NewIdempotencyKey()
-		name, link := "RCovery", "https://neocities.org"
+		name := "RCovery"
+		link, _ := shorturl.NewLink("https://neocities.org")
 
 		insertErr := repo.Insert(ctx, id, name, link, idempotencyKey)
 		if insertErr != nil {
@@ -62,12 +64,12 @@ func TestSelect(t *testing.T) {
 		if err != nil {
 			t.Errorf("Cannot get URL by name, instead got %q", err)
 		}
-		if foundShorturl.Link == "" {
+		if foundShorturl.Link == nil {
 			t.Errorf("Empty short url, maybe try to insert before")
 		}
 
-		if foundShorturl.Link != link {
-			t.Errorf("want %q, got %q", link, foundShorturl)
+		if !foundShorturl.Link.Equals(link) {
+			t.Errorf("want %q, got %q", link, foundShorturl.Link)
 		}
 	})
 }

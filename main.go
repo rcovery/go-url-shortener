@@ -22,7 +22,7 @@ import (
 func main() {
 	config.InitConfig()
 
-	baseContext, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	baseCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
 	connectionString := infra_postgres.GetConnectionFromEnv()
@@ -31,7 +31,7 @@ func main() {
 		panic(databaseErr)
 	}
 
-	otelShutdown, err := config.SetupOTelSDK(baseContext)
+	otelShutdown, err := config.SetupOTelSDK(baseCtx)
 	if err != nil {
 		panic(err)
 	}
@@ -41,16 +41,17 @@ func main() {
 
 	repoInstance := postgres.NewRepository(db)
 	serviceInstance := shorturl.NewService(repoInstance)
-	handlers.HandleShortURL(serviceInstance)
+	handlers.HandleShortURL(baseCtx, serviceInstance)
 
 	host := config.GetString("HOST")
 	port := config.GetString("PORT")
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", host, port),
-		BaseContext:  func(net.Listener) context.Context { return baseContext },
+		BaseContext:  func(net.Listener) context.Context { return baseCtx },
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
+		IdleTimeout:  1 * time.Second,
 	}
 
 	srvErr := make(chan error, 1)
@@ -61,7 +62,8 @@ func main() {
 	select {
 	case err = <-srvErr:
 		log.Fatal(err)
-	case <-baseContext.Done():
+		stop()
+	case <-baseCtx.Done():
 		stop()
 	}
 

@@ -14,7 +14,7 @@ func TestCreate(t *testing.T) {
 		id, _ := shorturl.NewID()
 		idempotencyKey, _ := shorturl.NewIdempotencyKey()
 		name := "open-this-link-right-now"
-		link := "https://google.com"
+		link, _ := shorturl.NewLink("https://google.com")
 
 		ctx := context.Background()
 		instance, postgresContainer := infra_postgres.SetupContainer(ctx, t)
@@ -27,7 +27,7 @@ func TestCreate(t *testing.T) {
 		if creationErr != nil {
 			t.Errorf("cannot create a short URL %q", creationErr)
 		}
-		if createdShorturl == "" {
+		if createdShorturl == nil {
 			t.Errorf("created URL is empty %q", createdShorturl)
 		}
 
@@ -51,7 +51,7 @@ func TestCreate(t *testing.T) {
 		id1, _ := shorturl.NewID()
 		idempotencyKey1, _ := shorturl.NewIdempotencyKey()
 		name := "taken-name"
-		link := "https://example.com"
+		link, _ := shorturl.NewLink("https://example.com")
 
 		_, firstErr := service.Create(ctx, id1, idempotencyKey1, name, link)
 		if firstErr != nil {
@@ -60,12 +60,13 @@ func TestCreate(t *testing.T) {
 
 		id2, _ := shorturl.NewID()
 		idempotencyKey2, _ := shorturl.NewIdempotencyKey()
+		link2, _ := shorturl.NewLink("https://other.com")
 
-		result, secondErr := service.Create(ctx, id2, idempotencyKey2, name, "https://other.com")
+		result, secondErr := service.Create(ctx, id2, idempotencyKey2, name, link2)
 		if secondErr == nil {
 			t.Errorf("expected an error when creating with duplicate name, got nil")
 		}
-		if result != "" {
+		if result != nil {
 			t.Errorf("want empty string, got %q", result)
 		}
 	})
@@ -81,7 +82,7 @@ func TestCreate(t *testing.T) {
 		id1, _ := shorturl.NewID()
 		idempotencyKey, _ := shorturl.NewIdempotencyKey()
 		name := "idempotent-link"
-		link := "https://example.com/original"
+		link, _ := shorturl.NewLink("https://example.com/original")
 
 		firstResult, firstErr := service.Create(ctx, id1, idempotencyKey, name, link)
 		if firstErr != nil {
@@ -94,7 +95,7 @@ func TestCreate(t *testing.T) {
 		if secondErr != nil {
 			t.Errorf("expected no error for idempotent creation, got %v", secondErr)
 		}
-		if secondResult != firstResult {
+		if !secondResult.Equals(firstResult) {
 			t.Errorf("want %q, got %q", firstResult, secondResult)
 		}
 	})
@@ -110,7 +111,7 @@ func TestCreate(t *testing.T) {
 		id1, _ := shorturl.NewID()
 		idempotencyKey, _ := shorturl.NewIdempotencyKey()
 		name := "googlewebsitey2k"
-		link := "https://google.com"
+		link, _ := shorturl.NewLink("https://google.com")
 
 		createdLink, creationErr := service.Create(ctx, id1, idempotencyKey, name, link)
 		if creationErr != nil {
@@ -121,7 +122,7 @@ func TestCreate(t *testing.T) {
 		if selectErr != nil {
 			t.Errorf("expected no error for idempotent creation, got %v", selectErr)
 		}
-		if selectedLink != createdLink {
+		if !selectedLink.Equals(createdLink) {
 			t.Errorf("want %q, got %q", createdLink, selectedLink)
 		}
 	})

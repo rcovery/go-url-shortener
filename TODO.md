@@ -9,10 +9,10 @@
 ## Architecture
 
 - [x] Make `Service.Repo` unexported (`repo` instead of `Repo`)
-- [ ] Remove `database/sql` import from `shorturl/service.go` — define a domain-level "not found" error
-- [ ] Have repository return `*ShortURL` instead of raw `string`
+- [x] Remove `database/sql` import from `shorturl/service.go` — define a domain-level "not found" error
+- [x] Have repository return `*ShortURL` instead of raw `string`
 - [x] Use `db.QueryContext(ctx, ...)` instead of `db.Query(...)` to respect context cancellation
-- [ ] Use the `ShortURL` domain struct (currently defined but never instantiated)
+- [x] Use the `ShortURL` domain struct (currently defined but never instantiated)
 
 ## Database
 
@@ -63,12 +63,9 @@
 
 ## Build & Deployment
 
-- [ ] Fix Makefile migration targets — references `database/migrations` but path is `internal/infra/postgres/migrations`
-- [ ] Fix Makefile `testcoverage` target (missing output file argument)
-- [ ] Add a Dockerfile for the Go application
-- [ ] Pin PostgreSQL image version in `docker-compose.yml` (currently `postgres:latest`)
-- [ ] Pin PostgreSQL image version in `testutil.go` (currently `postgres:latest`)
-- [ ] Fix Docker healthcheck to check correct database (`gourl` not `postgres`)
+- [x] Fix Makefile migration targets — references `database/migrations` but path is `internal/infra/postgres/migrations`
+- [x] Fix Makefile `testcoverage` target (missing output file argument)
+- [x] Fix Docker healthcheck to check correct database (`gourl` not `postgres`)
 - [ ] Remove leftover `golang-migrate/migrate/v4` dependency from `go.mod`
 - [ ] Move `goose` from indirect to direct dependency in `go.mod`
 - [ ] Add CI/CD pipeline configuration

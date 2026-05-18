@@ -11,12 +11,12 @@ import (
 	"github.com/rcovery/go-url-shortener/shorturl"
 )
 
-func HandleShortURL(service *shorturl.Service) {
+func HandleShortURL(baseCtx context.Context, service *shorturl.Service) {
 	http.HandleFunc("/api/url", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "POST":
 			{
-				ctx, ctxCancel := context.WithTimeout(context.Background(), 1*time.Second)
+				ctx, ctxCancel := context.WithTimeout(baseCtx, 1*time.Second)
 				defer ctxCancel()
 
 				contentType := r.Header.Get("Content-Type")
@@ -51,7 +51,7 @@ func HandleShortURL(service *shorturl.Service) {
 					writeJSONError(w, http.StatusBadRequest, "create_failed")
 					break
 				}
-				if createdLink == "" {
+				if createdLink == nil {
 					log.Println("Created an empty URL")
 					writeJSONError(w, http.StatusBadRequest, "create_failed")
 					break
@@ -71,18 +71,18 @@ func HandleShortURL(service *shorturl.Service) {
 		switch r.Method {
 		case "GET":
 			{
-				ctx, ctxCancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+				ctx, ctxCancel := context.WithTimeout(baseCtx, 100*time.Millisecond)
 				defer ctxCancel()
 
 				urlName := r.PathValue("url_name")
 				urlFromDatabase, selectionError := service.Select(ctx, urlName)
-				if selectionError != nil || urlFromDatabase == "" {
+				if selectionError != nil || urlFromDatabase == nil {
 					log.Println(selectionError)
 					writeJSONError(w, http.StatusNotFound, "not_found")
 					break
 				}
 
-				w.Header().Add("Location", urlFromDatabase)
+				w.Header().Add("Location", urlFromDatabase.String())
 				w.WriteHeader(303)
 				break
 			}

@@ -8,7 +8,7 @@ type Reader interface {
 }
 
 type Writer interface {
-	Insert(ctx context.Context, id ID, name string, link string, idempotencyKey IdempotencyKey) error
+	Insert(ctx context.Context, id ID, name string, link *Link, idempotencyKey IdempotencyKey) error
 }
 
 type Repository interface {
