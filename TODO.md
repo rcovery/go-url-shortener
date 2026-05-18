@@ -73,7 +73,7 @@
 ## Research / Design Questions
 
 - [ ] Evaluate creating a `Name` type with `NewName()` constructor for parsing/validation
-- [ ] Evaluate creating a `Link` type with `NewLink()` constructor for parsing/validation
+- [x] Evaluate creating a `Link` type with `NewLink()` constructor for parsing/validation
 
 ## Feature Ideas
 
