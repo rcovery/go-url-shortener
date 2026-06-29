@@ -41,7 +41,8 @@ func main() {
 
 	repoInstance := postgres.NewRepository(db)
 	serviceInstance := shorturl.NewService(repoInstance)
-	handlers.HandleShortURL(baseCtx, serviceInstance)
+	handlers.HandleShortURL(serviceInstance)
+	log.Println("Hello World")
 
 	host := config.GetString("HOST")
 	port := config.GetString("PORT")
